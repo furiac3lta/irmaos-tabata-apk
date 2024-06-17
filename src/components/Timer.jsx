@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ProgressCircle from './ProgressCircle';
 import { Link } from 'react-router-dom';
+import clickSound from '../assets/ring.mp3'
 
 const Timer = ({ settings }) => {
   const [timeLeft, setTimeLeft] = useState(settings.warmupTime);
@@ -8,6 +9,7 @@ const Timer = ({ settings }) => {
   const [mode, setMode] = useState('warmup');
   const [cycle, setCycle] = useState(0);
   const [percentage, setPercentage] = useState(0);
+  const audio = new Audio(clickSound); 
 
   useEffect(() => {
     if (isRunning) {
@@ -26,29 +28,29 @@ const Timer = ({ settings }) => {
 
   useEffect(() => {
     if (timeLeft <= 0) {
-      switch (mode) {
-        case 'work':
-          setMode('rest');
-          setTimeLeft(settings.restTimeMinutes * 60 + settings.restTimeSeconds);
-          break;
-        case 'rest':
-          if (cycle + 1 === settings.cycles) {
-            setIsRunning(false);
-            setCycle(0);
-            setMode('warmup');
-            setTimeLeft(settings.warmupTime);
-          } else {
-            setMode('warmup');
-            setTimeLeft(settings.warmupTime);
-            setCycle((prev) => prev + 1);
-          }
-          break;
-        case 'warmup':
-          setMode('work');
-          setTimeLeft(settings.workTimeMinutes * 60 + settings.workTimeSeconds);
-          break;
-        default:
-          break;
+      if (cycle === 0 && mode === 'warmup') {
+        // After the first warmup, go directly to work
+        setMode('work');
+        setTimeLeft(settings.workTimeMinutes * 60 + settings.workTimeSeconds);
+      } else if (cycle === settings.cycles - 1 && mode === 'work') {
+        // End the timer after the last work cycle
+        setIsRunning(false);
+      } else {
+        switch (mode) {
+          case 'work':
+            setMode('rest');
+            setTimeLeft(settings.restTimeMinutes * 60 + settings.restTimeSeconds);
+            break;
+          case 'rest':
+            setMode('work');
+            setTimeLeft(settings.workTimeMinutes * 60 + settings.workTimeSeconds);
+            if (cycle + 1 < settings.cycles) {
+              setCycle((prev) => prev + 1);
+            }
+            break;
+          default:
+            break;
+        }
       }
     }
   }, [timeLeft, mode, settings, cycle]);
@@ -57,6 +59,12 @@ const Timer = ({ settings }) => {
     const totalTime = mode === 'work' ? settings.workTimeMinutes * 60 + settings.workTimeSeconds : mode === 'rest' ? settings.restTimeMinutes * 60 + settings.restTimeSeconds : settings.warmupTime;
     setPercentage(((totalTime - timeLeft) / totalTime) * 100);
   }, [timeLeft, mode, settings]);
+ 
+  useEffect(() => {
+    if (mode === 'work') {
+      audio.play();
+    }
+  }, [mode]);
 
   const handleStartPause = () => {
     setIsRunning(!isRunning);
@@ -71,11 +79,9 @@ const Timer = ({ settings }) => {
   };
 
   return (
-      
     <div className="timer">
       <h1 className={`mode-label ${mode}`}>{mode.toUpperCase()}</h1>
-      <ProgressCircle percentage={percentage} timeLeft={timeLeft} mode={mode} 
-       />
+      <ProgressCircle percentage={percentage} timeLeft={timeLeft} mode={mode} />
       <div className="cycle-info">
         Cycle {cycle + 1} / {settings.cycles}
       </div>
