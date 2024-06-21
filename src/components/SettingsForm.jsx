@@ -11,12 +11,18 @@ const SettingsForm = ({ onSaveSettings, setPreset }) => {
         cycles: 4,
     });
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setSettings({
-            ...settings,
-            [name]: value,
-        });
+    const increment = (name, max = 59) => {
+        setSettings(prevSettings => ({
+            ...prevSettings,
+            [name]: prevSettings[name] < max ? prevSettings[name] + 1 : max,
+        }));
+    };
+
+    const decrement = (name, min = 0) => {
+        setSettings(prevSettings => ({
+            ...prevSettings,
+            [name]: prevSettings[name] > min ? prevSettings[name] - 1 : min,
+        }));
     };
 
     const handleSave = () => {
@@ -47,77 +53,62 @@ const SettingsForm = ({ onSaveSettings, setPreset }) => {
     };
 
     return (
-        
-            <div className="settings-form">
-                <h3>Work</h3>
-                <div>
-                    <label>min:</label>
-                    <input
-                        type="number"
-                        name="workTimeMinutes"
-                        value={settings.workTimeMinutes}
-                        onChange={handleChange}
-                        min="0"
-                        max="59"
-                    />
-                    <label>sec:</label>
-                    <input
-                        type="number"
-                        name="workTimeSeconds"
-                        value={settings.workTimeSeconds}
-                        onChange={handleChange}
-                        min="0"
-                        max="59"
-                    />
+        <div className="settings-form">
+           
+            <div className="setting">
+                <label>Lucha Min</label>
+                <div className="control-group">
+                    <span>{settings.workTimeMinutes}</span>
+                    <button onClick={() => increment('workTimeMinutes', 59)}>▲</button>
+                    <button onClick={() => decrement('workTimeMinutes', 0)}>▼</button>
                 </div>
-                <h3>Rest</h3>
-                <div>
-                    <label>min:</label>
-                    <input
-                        type="number"
-                        name="restTimeMinutes"
-                        value={settings.restTimeMinutes}
-                        onChange={handleChange}
-                        min="0"
-                        max="59"
-                    />
-                    <label>sec:</label>
-                    <input
-                        type="number"
-                        name="restTimeSeconds"
-                        value={settings.restTimeSeconds}
-                        onChange={handleChange}
-                        min="0"
-                        max="59"
-                    />
-                </div>
-                <h3>Warmup</h3>
-                <div>
-                    <label>sec:</label>
-                    <input
-                        type="number"
-                        name="warmupTime"
-                        value={settings.warmupTime}
-                        onChange={handleChange}
-                        min="0"
-                        max="59"
-                    />
-                    <label id='cycle'>Cycles:</label>
-                    <input
-                        type="number"
-                        name="cycles"
-                        value={settings.cycles}
-                        onChange={handleChange}
-                        min="1"
-                    />
-                </div>
-                <div>
-
-                </div>
-                <button onClick={handleSave} className="btn">Save Settings</button>
-                <button onClick={() => handlePreset('drills')} className="btn">Drills Preset</button>
-                <button onClick={() => handlePreset('lucha')} className="btn">Lucha Preset</button>
             </div>
+            <div className="setting">
+                <label>Lucha Seg</label>
+                <div className="control-group">
+                    <span>{settings.workTimeSeconds}</span>
+                    <button onClick={() => increment('workTimeSeconds', 59)}>▲</button>
+                    <button onClick={() => decrement('workTimeSeconds', 0)}>▼</button>
+                </div>
+            </div>
+            <div className="setting">
+                <label>Descanso Min</label>
+                <div className="control-group">
+                    <span>{settings.restTimeMinutes}</span>
+                    <button onClick={() => increment('restTimeMinutes', 59)}>▲</button>
+                    <button onClick={() => decrement('restTimeMinutes', 0)}>▼</button>
+                </div>
+            </div>
+            <div className="setting">
+                <label>Descanso Seg</label>
+                <div className="control-group">
+                    <span>{settings.restTimeSeconds}</span>
+                    <button onClick={() => increment('restTimeSeconds', 59)}>▲</button>
+                    <button onClick={() => decrement('restTimeSeconds', 0)}>▼</button>
+                </div>
+            </div>
+            <div className="setting">
+                <label>Calentar Seg</label>
+                <div className="control-group">
+                    <span>{settings.warmupTime}</span>
+                    <button onClick={() => increment('warmupTime', 59)}>▲</button>
+                    <button onClick={() => decrement('warmupTime', 0)}>▼</button>
+                </div>
+            </div>
+            <div className="setting">
+                <label id="cycles">Repeticiones</label>
+                <div className="control-group">
+                    <span>{settings.cycles}</span>
+                    <button onClick={() => increment('cycles')}>▲</button>
+                    <button onClick={() => decrement('cycles', 1)}>▼</button>
+                </div>
+            </div>
+            <div className="button-group">
+                <button onClick={handleSave} className="btn">Save</button>
+                <button onClick={() => handlePreset('drills')} className="btn">Drills</button>
+                <button onClick={() => handlePreset('lucha')} className="btn">Lucha</button>
+            </div>
+        </div>
     );
 };
 

@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import ProgressCircle from './ProgressCircle';
 import { Link } from 'react-router-dom';
 import clickSound from '../assets/ring.mp3'
+import './Timer.css';
+import { FaPlay } from "react-icons/fa";
+import { FaPause } from "react-icons/fa6";
+import { IoSettingsSharp } from "react-icons/io5";
+import { GrPowerReset } from "react-icons/gr";
 
 const Timer = ({ settings }) => {
   const [timeLeft, setTimeLeft] = useState(settings.warmupTime);
@@ -30,19 +35,19 @@ const Timer = ({ settings }) => {
     if (timeLeft <= 0) {
       if (cycle === 0 && mode === 'warmup') {
         // After the first warmup, go directly to work
-        setMode('work');
+        setMode('LUCHA');
         setTimeLeft(settings.workTimeMinutes * 60 + settings.workTimeSeconds);
-      } else if (cycle === settings.cycles - 1 && mode === 'work') {
+      } else if (cycle === settings.cycles - 1 && mode === 'LUCHA') {
         // End the timer after the last work cycle
         setIsRunning(false);
       } else {
         switch (mode) {
-          case 'work':
+          case 'LUCHA':
             setMode('rest');
             setTimeLeft(settings.restTimeMinutes * 60 + settings.restTimeSeconds);
             break;
           case 'rest':
-            setMode('work');
+            setMode('LUCHA');
             setTimeLeft(settings.workTimeMinutes * 60 + settings.workTimeSeconds);
             if (cycle + 1 < settings.cycles) {
               setCycle((prev) => prev + 1);
@@ -56,12 +61,12 @@ const Timer = ({ settings }) => {
   }, [timeLeft, mode, settings, cycle]);
 
   useEffect(() => {
-    const totalTime = mode === 'work' ? settings.workTimeMinutes * 60 + settings.workTimeSeconds : mode === 'rest' ? settings.restTimeMinutes * 60 + settings.restTimeSeconds : settings.warmupTime;
+    const totalTime = mode === 'LUCHA' ? settings.workTimeMinutes * 60 + settings.workTimeSeconds : mode === 'rest' ? settings.restTimeMinutes * 60 + settings.restTimeSeconds : settings.warmupTime;
     setPercentage(((totalTime - timeLeft) / totalTime) * 100);
   }, [timeLeft, mode, settings]);
  
   useEffect(() => {
-    if (mode === 'work') {
+    if (mode === 'LUCHA') {
       audio.play();
     }
   }, [mode]);
@@ -81,7 +86,9 @@ const Timer = ({ settings }) => {
   return (
     <div className="timer">
       <h1 className={`mode-label ${mode}`}>{mode.toUpperCase()}</h1>
+      <div className='circle_container'>
       <ProgressCircle percentage={percentage} timeLeft={timeLeft} mode={mode} />
+      </div>
       <div className="cycle-info">
         Cycle {cycle + 1} / {settings.cycles}
       </div>
@@ -89,8 +96,8 @@ const Timer = ({ settings }) => {
         <button onClick={handleStartPause} className="btn">
           {isRunning ? 'Pause' : 'Start'}
         </button>
-        <button onClick={handleReset} className="btn">
-          Reset
+        <button  onClick={handleReset} className="btn">
+        Reset
         </button>
         <Link to="/settings" state={{ settings }}>
           <button className="btn">Settings</button>

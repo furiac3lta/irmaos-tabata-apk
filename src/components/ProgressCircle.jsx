@@ -5,14 +5,14 @@ import 'react-circular-progressbar/dist/styles.css';
 const ProgressCircle = ({ percentage, timeLeft, mode }) => {
   let color;
   switch (mode) {
-    case 'work':
-      color = '#738eee'; // Rojo para el trabajo
+    case 'LUCHA':
+      color = '#738eee'; 
       break;
     case 'rest':
-      color = '#66cdaa'; // Verde para el descanso
+      color = '#66cdaa'; 
       break;
     case 'warmup':
-      color = '#e6711b'; // Amarillo para el calentamiento
+      color = '#e6711b'; 
       break;
     default:
       color = '#9a988d';

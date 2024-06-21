@@ -22,8 +22,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="settings">
-      <h2>Settings</h2>
+    <div className="settings-miform">
       <SettingsForm onSaveSettings={handleSaveSettings} setPreset={setSettings} />
     </div>
   );
